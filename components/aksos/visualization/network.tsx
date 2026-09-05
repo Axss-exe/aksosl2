@@ -1,0 +1,93 @@
+'use client'
+
+import { useEffect, useMemo, useRef, useState } from 'react'
+
+type NodeKind = 'company' | 'government' | 'capital' | 'project' | 'market' | 'institution'
+
+type Node = {
+  id: string
+  label: string
+  kind: NodeKind
+  x: number
+  y: number
+  r?: number
+  labelVisible?: boolean
+}
+
+type Edge = { from: string; to: string; emphasis?: boolean }
+
+export type NetworkPreset = 'activity' | 'fragmented' | 'resolved' | 'intelligence'
+
+const palettes: Record<NodeKind, string> = {
+  company: '#111111', government: '#555555', capital: '#777773', project: '#242424', market: '#8a8a84', institution: '#b0b0aa',
+}
+
+const presets: Record<NetworkPreset, { nodes: Node[]; edges: Edge[] }> = {
+  activity: {
+    nodes: [
+      { id: 'a', label: 'COMPANY', kind: 'company', x: 18, y: 27, r: 5, labelVisible: true }, { id: 'b', label: 'CAPITAL', kind: 'capital', x: 35, y: 45, r: 4 }, { id: 'c', label: 'MARKET', kind: 'market', x: 55, y: 21, r: 5, labelVisible: true }, { id: 'd', label: 'PROJECT', kind: 'project', x: 73, y: 36, r: 4 }, { id: 'e', label: 'INSTITUTION', kind: 'institution', x: 86, y: 65, r: 4 }, { id: 'f', label: 'GOVERNMENT', kind: 'government', x: 58, y: 70, r: 5, labelVisible: true }, { id: 'g', label: 'COMPANY', kind: 'company', x: 25, y: 78, r: 4 }, { id: 'h', label: 'MARKET', kind: 'market', x: 8, y: 63, r: 3 }, { id: 'i', label: 'PROJECT', kind: 'project', x: 42, y: 13, r: 3 }, { id: 'j', label: 'CAPITAL', kind: 'capital', x: 80, y: 16, r: 3 },
+    ], edges: [{ from: 'a', to: 'b' }, { from: 'b', to: 'c' }, { from: 'c', to: 'd' }, { from: 'd', to: 'e' }, { from: 'e', to: 'f' }, { from: 'f', to: 'g' }, { from: 'g', to: 'h' }, { from: 'h', to: 'a' }, { from: 'a', to: 'i' }, { from: 'c', to: 'i' }, { from: 'c', to: 'j' }, { from: 'd', to: 'j' }, { from: 'b', to: 'g' }, { from: 'f', to: 'd' }],
+  },
+  fragmented: {
+    nodes: [
+      { id: 'a', label: 'COMPANY', kind: 'company', x: 15, y: 25, r: 5, labelVisible: true }, { id: 'b', label: 'REGULATION', kind: 'government', x: 42, y: 16, r: 4 }, { id: 'c', label: 'CAPITAL', kind: 'capital', x: 80, y: 24, r: 5, labelVisible: true }, { id: 'd', label: 'PROJECT', kind: 'project', x: 22, y: 70, r: 5, labelVisible: true }, { id: 'e', label: 'INSTITUTION', kind: 'institution', x: 50, y: 75, r: 4 }, { id: 'f', label: 'MARKET', kind: 'market', x: 83, y: 70, r: 5, labelVisible: true }, { id: 'g', label: 'MINISTRY', kind: 'government', x: 59, y: 39, r: 3 }, { id: 'h', label: 'PERSON', kind: 'institution', x: 8, y: 50, r: 3 },
+    ], edges: [{ from: 'a', to: 'b' }, { from: 'c', to: 'g' }, { from: 'd', to: 'e' }, { from: 'e', to: 'f' }, { from: 'h', to: 'd' }],
+  },
+  resolved: {
+    nodes: [
+      { id: 'a', label: 'COMPANY', kind: 'company', x: 19, y: 30, r: 6, labelVisible: true }, { id: 'b', label: 'CAPITAL', kind: 'capital', x: 39, y: 48, r: 5 }, { id: 'c', label: 'GOVERNMENT', kind: 'government', x: 60, y: 26, r: 5, labelVisible: true }, { id: 'd', label: 'PROJECT', kind: 'project', x: 77, y: 48, r: 5 }, { id: 'e', label: 'MARKET', kind: 'market', x: 61, y: 76, r: 5, labelVisible: true }, { id: 'f', label: 'INSTITUTION', kind: 'institution', x: 35, y: 76, r: 4 }, { id: 'g', label: 'REGULATION', kind: 'government', x: 47, y: 18, r: 3 }, { id: 'h', label: 'PERSON', kind: 'institution', x: 12, y: 65, r: 3 },
+    ], edges: [{ from: 'a', to: 'b', emphasis: true }, { from: 'a', to: 'c' }, { from: 'a', to: 'h' }, { from: 'b', to: 'c', emphasis: true }, { from: 'b', to: 'd' }, { from: 'b', to: 'f' }, { from: 'c', to: 'd', emphasis: true }, { from: 'c', to: 'g' }, { from: 'd', to: 'e', emphasis: true }, { from: 'e', to: 'f' }, { from: 'f', to: 'a' }, { from: 'g', to: 'b' }],
+  },
+  intelligence: {
+    nodes: [
+      { id: 'a', label: 'AKSOS', kind: 'company', x: 50, y: 50, r: 8, labelVisible: true }, { id: 'b', label: 'COMPANY', kind: 'company', x: 17, y: 23, r: 5, labelVisible: true }, { id: 'c', label: 'CAPITAL', kind: 'capital', x: 79, y: 22, r: 5, labelVisible: true }, { id: 'd', label: 'GOVERNMENT', kind: 'government', x: 84, y: 72, r: 5, labelVisible: true }, { id: 'e', label: 'PROJECT', kind: 'project', x: 50, y: 84, r: 5 }, { id: 'f', label: 'MARKET', kind: 'market', x: 16, y: 73, r: 5, labelVisible: true }, { id: 'g', label: 'INSTITUTION', kind: 'institution', x: 31, y: 47, r: 3 }, { id: 'h', label: 'REGULATION', kind: 'government', x: 69, y: 47, r: 3 }, { id: 'i', label: 'PERSON', kind: 'institution', x: 37, y: 66, r: 3 }, { id: 'j', label: 'MINISTRY', kind: 'government', x: 64, y: 67, r: 3 },
+    ], edges: [{ from: 'a', to: 'b', emphasis: true }, { from: 'a', to: 'c', emphasis: true }, { from: 'a', to: 'd', emphasis: true }, { from: 'a', to: 'e', emphasis: true }, { from: 'a', to: 'f', emphasis: true }, { from: 'a', to: 'g' }, { from: 'a', to: 'h' }, { from: 'a', to: 'i' }, { from: 'a', to: 'j' }, { from: 'b', to: 'g' }, { from: 'c', to: 'h' }, { from: 'd', to: 'j' }, { from: 'e', to: 'i' }, { from: 'f', to: 'g' }],
+  },
+}
+
+export function Network({ preset, label }: { preset: NetworkPreset; label: string }) {
+  const ref = useRef<SVGSVGElement>(null)
+  const [active, setActive] = useState<string | null>(null)
+  const [visible, setVisible] = useState(false)
+  const [reduced, setReduced] = useState(false)
+  const config = presets[preset]
+  const positions = useMemo(() => Object.fromEntries(config.nodes.map((n, i) => [n.id, { x: n.x, y: n.y, phase: i * 0.81 }])) as Record<string, { x: number; y: number; phase: number }>, [config])
+
+  useEffect(() => {
+    const media = window.matchMedia('(prefers-reduced-motion: reduce)')
+    const update = () => setReduced(media.matches)
+    update(); media.addEventListener('change', update)
+    const observer = new IntersectionObserver(([entry]) => setVisible(entry.isIntersecting), { threshold: 0.05 })
+    if (ref.current) observer.observe(ref.current)
+    return () => { media.removeEventListener('change', update); observer.disconnect() }
+  }, [])
+
+  useEffect(() => {
+    if (reduced || !visible || !ref.current) return
+    let frame = 0
+    const start = performance.now()
+    const tick = (now: number) => {
+      const t = (now - start) / 1000
+      config.nodes.forEach((node) => {
+        const point = ref.current?.querySelector(`[data-node="${node.id}"]`) as SVGGElement | null
+        const base = positions[node.id]
+        if (point && base) point.setAttribute('transform', `translate(${base.x + Math.sin(t * 0.34 + base.phase) * 0.8} ${base.y + Math.cos(t * 0.27 + base.phase) * 0.7})`)
+      })
+      frame = requestAnimationFrame(tick)
+    }
+    frame = requestAnimationFrame(tick)
+    return () => cancelAnimationFrame(frame)
+  }, [config, positions, reduced, visible])
+
+  const neighbors = active ? new Set(config.edges.flatMap((edge) => edge.from === active ? [edge.to] : edge.to === active ? [edge.from] : [])) : null
+  return (
+    <div className="network-frame">
+      <svg ref={ref} className="network-svg" viewBox="0 0 100 100" role="img" aria-label={label} preserveAspectRatio="xMidYMid meet">
+        <g className="network-grid"><path d="M0 25H100M0 50H100M0 75H100M25 0V100M50 0V100M75 0V100" /></g>
+        <g className="network-edges">{config.edges.map((edge, i) => { const from = config.nodes.find((n) => n.id === edge.from)!; const to = config.nodes.find((n) => n.id === edge.to)!; const dim = active && active !== edge.from && active !== edge.to && !neighbors?.has(edge.from) && !neighbors?.has(edge.to); return <line key={`${edge.from}-${edge.to}-${i}`} x1={from.x} y1={from.y} x2={to.x} y2={to.y} className={`${edge.emphasis ? 'edge-emphasis' : ''} ${dim ? 'is-dim' : ''}`} /> })}</g>
+        {config.nodes.map((node) => { const isActive = active === node.id; const dim = active && !isActive && !neighbors?.has(node.id); return <g key={node.id} data-node={node.id} transform={`translate(${node.x} ${node.y})`} className={`network-node ${isActive ? 'is-active' : ''} ${dim ? 'is-dim' : ''}`} onMouseEnter={() => setActive(node.id)} onMouseLeave={() => setActive(null)} onFocus={() => setActive(node.id)} onBlur={() => setActive(null)} tabIndex={0} role="button" aria-label={`${node.label} entity`}><circle r={node.r ?? 4} fill={palettes[node.kind]} /><circle r={(node.r ?? 4) + 2.5} className="node-ring" />{node.labelVisible && <text x={(node.r ?? 4) + 4} y="1" className="node-label">{node.label}</text>}</g> })}
+      </svg>
+      <span className="network-caption">{label}</span>
+    </div>
+  )
+}
