@@ -1,63 +1,68 @@
 'use client'
 
-import { Network, type NetworkPreset } from './visualization/network'
+import { Network } from './visualization/network'
 
-type Phase = { index: string; title: string; text: string; preset: NetworkPreset; className: string }
+type LabelProps = { index: string; children: React.ReactNode }
 
-const phases: Phase[] = [
-  { index: '03.01', title: 'Visibility is upstream of participation.', text: 'When signals are difficult to see, they become difficult to understand, trust and enter.', preset: 'fragmented', className: 'phase-gap' },
-  { index: '03.02', title: 'What becomes visible can become connected.', text: 'Relationships reveal movement, context and opportunity where isolated data stops.', preset: 'resolved', className: 'phase-change' },
-]
+function SectionLabel({ index, children }: LabelProps) {
+  return <p className="eyebrow"><span>{index}</span>{children}</p>
+}
+
+function ArrowLink({ children, href = '#contact' }: { children: React.ReactNode; href?: string }) {
+  return <a className="arrow-link" href={href}>{children}<span aria-hidden="true">↗</span></a>
+}
+
+function ComparisonGraph() {
+  return <div className="comparison-graph" aria-label="Comparison of fragmented and connected ecosystem coverage">
+    <div className="comparison-panel comparison-without"><span className="comparison-title">Without coverage</span><p>Isolated signals. Missing relationships. Dead ends.</p><Network preset="fragmented" label="Fragmented ecosystem with isolated nodes" /></div>
+    <div className="comparison-panel comparison-with"><span className="comparison-title">With ecosystem coverage</span><p>The same entities, with relationships becoming visible.</p><Network preset="resolved" label="Connected ecosystem with visible relationships" /></div>
+  </div>
+}
+
+function Flow({ items }: { items: string[] }) {
+  return <div className="editorial-flow">{items.map((item, i) => <span key={item}><b>{item}</b>{i < items.length - 1 && <i aria-hidden="true">↓</i>}</span>)}</div>
+}
 
 function Nav() {
-  return <header className="aksos-nav"><a href="#top" className="wordmark" aria-label="AKSOS home"><img src="/aksos-symbol-traced.svg" alt="" />AKSOS<span className="wordmark-dot">.</span></a><nav aria-label="Primary navigation"><a href="#how-it-works">The premise</a><a href="#intelligence">ATIS</a><a href="#contact">Contact</a></nav><span className="nav-status"><span className="status-dot" /> Intelligence infrastructure</span></header>
+  return <header className="aksos-nav"><a href="#top" className="wordmark" aria-label="AKSOS home"><img src="/aksos-symbol-traced.svg" alt="" />AKSOS<span className="wordmark-dot">.</span></a><nav aria-label="Primary navigation"><a href="#about">About</a><a href="#atis">ATIS</a><a href="#batana">Batana</a><a href="#contact">Contact</a></nav><a className="nav-cta" href="#batana">Join Batana <span aria-hidden="true">↗</span></a></header>
 }
-
-function ArrowLink({ children, href = '#contact' }: { children: React.ReactNode; href?: string }) { return <a className="arrow-link" href={href}>{children}<span aria-hidden="true">↗</span></a> }
-function SectionLabel({ index, children }: { index: string; children: React.ReactNode }) { return <p className="eyebrow"><span>{index}</span>{children}</p> }
-
-function TechnicalContext({ items, className = '' }: { items: string[]; className?: string }) { return <div className={`technical-context ${className}`} aria-label="System context">{items.map((item) => <span key={item}>{item}</span>)}</div> }
-
-function Workflow() { return <div className="workflow" aria-label="Conceptual intelligence workflow">{['DISCOVER', 'STRUCTURE', 'CONNECT', 'CONTEXTUALIZE', 'INTERPRET', 'ACT'].map((item, i) => <span key={item}><b>{String(i + 1).padStart(2, '0')}</b>{item}</span>)}</div> }
-
-function QuestionFlow({ question }: { question: string }) { return <div className="question-flow"><strong>{question}</strong><span>↓</span><span>ECOSYSTEM INFORMATION</span><span>↓</span><span>RELATIONSHIPS + CONTEXT</span><span>↓</span><b>PERSPECTIVE</b></div> }
-
-function DependencyDiagram() {
-  return <div className="dependency-diagram" aria-label="Visibility leads to understanding, trust and entry"><div className="dependency-line" />{['Difficult to see', 'Difficult to understand', 'Difficult to trust', 'Difficult to enter', 'Opportunity lost'].map((label, i) => <div className={`dependency-step step-${i}`} key={label}><span>0{i + 1}</span><strong>{label}</strong></div>)}</div>
-}
-
-function PerspectiveDiagram() {
-  return <div className="perspective-diagram" aria-label="One event interpreted through multiple perspectives"><div className="perspective-event"><span className="diagram-node large" />EVENT</div><div className="perspective-branches"><div><span className="diagram-node" />INVESTOR<small>Capital / risk / upside</small></div><div><span className="diagram-node" />ENTERPRISE<small>Market / action / reach</small></div><div><span className="diagram-node" />INSTITUTION<small>Policy / impact / trust</small></div></div></div>
-}
-
-function Pathway() { return <div className="pathway">{['Join Batana', 'Participate', 'Contribute', 'Apply', 'Selected', 'ATIS'].map((item, i) => <div className={i === 4 ? 'selected' : ''} key={item}><span>{String(i + 1).padStart(2, '0')}</span><strong>{item}</strong>{i < 5 && <b aria-hidden="true">→</b>}</div>)}</div> }
 
 export function AksosPage() {
   return <main id="top" className="aksos-shell">
     <Nav />
-    <section className="hero section-grid" aria-labelledby="hero-title"><div className="hero-copy"><SectionLabel index="01">Intelligence for African ecosystems</SectionLabel><h1 id="hero-title">Make the<br /><em>invisible</em><br />legible.</h1><p className="hero-intro">AKSOS is an intelligence infrastructure layer being built to make African economic and institutional ecosystems easier to discover, understand and participate in.</p><TechnicalContext items={['SYS_STATUS // ACTIVE', 'ENTITY DISCOVERY', 'RELATIONSHIP MAPPING']} /><ArrowLink href="#how-it-works">See the system</ArrowLink></div><div className="hero-network"><Network preset="activity" label="A living network of companies, markets, capital and institutions" /><p className="figure-note">The ecosystem is already moving.<br />We help you see how.</p></div><div className="hero-meta"><span>DAKAR · NAIROBI · LAGOS</span><span>2024—2025</span></div></section>
+    <section className="hero section-grid" aria-labelledby="hero-title"><div className="hero-copy"><SectionLabel index="00">An emerging initiative</SectionLabel><h1 id="hero-title">What if more of Africa could be <em>seen?</em></h1><p className="hero-intro">AKSOS is researching and building systems that make complex African ecosystems more visible, understandable and connected.</p><p className="honesty-note">This is an active hypothesis. The work is still being tested.</p><ArrowLink href="#world">Explore the question</ArrowLink></div><div className="hero-network"><Network preset="activity" label="A living network of companies, markets, capital and institutions" /><p className="figure-note">Companies. Institutions. Capital. Projects.<br />An ecosystem already in motion.</p></div></section>
 
-    <section className="statement" id="how-it-works"><SectionLabel index="02">The premise</SectionLabel><p className="statement-text">The continent&apos;s most important signals are often hidden in plain sight.</p><div className="statement-aside"><span className="rule" /><p>Activity is abundant.<br />Context is scarce.</p></div></section>
+    <section id="world" className="world-section"><SectionLabel index="01">The world</SectionLabel><div className="world-copy"><h2>Africa is full of <em>activity.</em></h2><p>Companies build. Governments regulate. People move. Capital moves. Projects begin. Markets change. Institutions interact. Opportunities emerge.</p><p>The ecosystem is alive. But activity is not the same as visibility.</p></div></section>
 
-    <section className="visibility-section"><div className="section-copy"><SectionLabel index="03">The visibility gap</SectionLabel><h2>Something exists<br />before it is <em>seen.</em></h2><p>People, capital, projects and policy are already in motion. From a distance, the ecosystem dissolves into fragments.</p></div><div className="gap-field"><div className="visible-ecosystem"><span>Visible ecosystem</span>{['People', 'Enterprises', 'Capital', 'Projects', 'Policy', 'Opportunities'].map((x) => <b key={x}><i />{x}</b>)}</div><div className="distance-field"><span>From a distance</span><i>?</i><i>·</i><i>?</i><i>·</i><i>?</i></div></div></section>
+    <section className="visibility-section"><div className="section-copy"><SectionLabel index="02">The visibility gap</SectionLabel><h2>The information exists. The visibility doesn&apos;t always.</h2><p>Important signals can be distributed across institutions, company records, reports, regulations, projects, people and disconnected databases.</p></div><ComparisonGraph /></section>
 
-    <section className="dependency-section"><div className="section-copy"><SectionLabel index="04">Why visibility matters</SectionLabel><h2>Visibility is<br /><em>upstream.</em></h2><p>Lack of visibility is not the only constraint. It is the condition that makes the other constraints harder to navigate.</p></div><DependencyDiagram /></section>
+    <section className="dependency-section"><div className="section-copy"><SectionLabel index="03">Why visibility matters</SectionLabel><h2>If it is difficult to see, it becomes difficult to <em>understand.</em></h2><p>Visibility is not the only condition for participation. It is one layer of infrastructure that makes informed participation easier.</p></div><Flow items={['DIFFICULT TO SEE', 'DIFFICULT TO UNDERSTAND', 'DIFFICULT TO TRUST', 'DIFFICULT TO ENTER', 'OPPORTUNITY CAN BE MISSED']} /></section>
 
-    <section className="phases"><div className="phase-intro"><SectionLabel index="05">From activity to intelligence</SectionLabel><h2>Every fragment<br />has a <em>relationship.</em></h2></div>{phases.map((phase) => <article className={`phase ${phase.className}`} key={phase.index}><div className="phase-copy"><p className="phase-index">{phase.index}</p><h3>{phase.title}</h3><p>{phase.text}</p></div><Network preset={phase.preset} label={`${phase.index}: ${phase.title}`} /></article>)}</section>
+    <section className="hypothesis-section"><SectionLabel index="04">What could change?</SectionLabel><h2>Fragmented <span>→</span> visible <span>→</span> connected <span>→</span> understandable.</h2><p>What happens when people, companies, institutions, projects, capital, policy and markets can be read in relationship rather than isolation?</p><Network preset="resolved" label="Relationships progressively emerging from fragmented signals" /></section>
 
-    <section className="aksos-section"><div className="section-copy"><SectionLabel index="06">The operator layer</SectionLabel><h2>You do the work.<br /><em>AKSOS</em> gives it context.</h2><p>Infrastructure should support the operator, not become the protagonist. The work stays human. The view gets wider.</p></div><div className="operator-diagram"><strong>YOU</strong><span>↓</span><strong>YOUR WORK</strong><span>↓</span><div className="small-mark"><img src="/aksos-symbol-traced.svg" alt="" /> AKSOS</div><span>↓</span><p>VISIBILITY<br />+ CONTEXT<br />+ UNDERSTANDING</p></div></section>
+    <section id="about" className="origin-section"><div className="section-copy"><SectionLabel index="05">Origin // Tino Makiriyado</SectionLabel><h2>The idea came from working inside the <em>problem.</em></h2><p>Experience working with CIVA involved breaking down complex systems and ecosystems, understanding how different entities interact, and turning fragmented information into a coherent picture.</p><p>Working across countries made a recurring problem visible: the information often existed, but was difficult to find, verify, connect and interpret.</p></div><div className="origin-aside"><span className="origin-mark">AKSOS</span><p>Information access is an ecosystem problem.</p></div></section>
 
-    <section className="atis-section" id="intelligence"><div className="section-copy"><SectionLabel index="07">ATIS / Africa Trade Intelligence System</SectionLabel><h2>Information becomes<br /><em>perspective.</em></h2><p>ATIS is a multi-layer intelligence system for reading the relationships behind the signal: entities, events, projects, institutions, capital and policy.</p><TechnicalContext items={['DATA COVERAGE', 'ENTITY DISCOVERY', 'RELATIONSHIP MAPPING', 'PERSPECTIVE // ZIMBABWE']} /><Workflow /></div><div className="atis-visual"><div className="atis-layers"><span>INFORMATION</span><b>↓</b><div className="layer-box"><small>DATA COVERAGE // RELATIONSHIP DISCOVERY</small><Network preset="intelligence" label="ATIS relationship discovery graph" /><small>CONTEXT // PERSPECTIVE ANALYSIS</small></div><b>↓</b><span>CONTEXT</span><b>↓</b><span>PERSPECTIVE</span><b>↓</b><strong>INTELLIGENCE</strong></div><PerspectiveDiagram /></div></section>
+    <section className="pilot-section"><div className="section-copy"><SectionLabel index="06">Pilot // Zimbabwe</SectionLabel><h2>An idea needs somewhere real to be <em>tested.</em></h2><p>Zimbabwe is the first environment in which AKSOS is investigating whether a deeper intelligence layer can make an ecosystem materially easier to see and understand.</p><p>The aim is not to assume a result. It is to produce evidence.</p></div><div className="pilot-graph"><Network preset="intelligence" label="Zimbabwe pilot ecosystem represented as institutions, enterprises, projects and relationships" /><Flow items={['ZIMBABWE', 'TEST', 'EVIDENCE', 'LEARN', 'EVALUATE', 'TRANSFER?']} /></div></section>
 
-    <section className="use-cases"><SectionLabel index="08">Question-specific intelligence</SectionLabel><h2>Different questions.<br /><em>Different meaning.</em></h2><div className="case-grid"><article><span>01 / INVESTOR</span><h3>Where are the relevant opportunities?</h3><QuestionFlow question="OPERATIONAL QUESTION" /></article><article><span>02 / ENTERPRISE</span><h3>Who is connected to this organization?</h3><QuestionFlow question="RELATIONSHIP QUESTION" /></article><article><span>03 / OPERATOR</span><h3>What does this development mean for me?</h3><QuestionFlow question="PERSPECTIVE QUESTION" /></article></div></section>
+    <section className="research-break"><p className="eyebrow"><span>07</span> The research question</p><h2>Can this <em>work?</em></h2><p>Can an intelligence system materially improve the ability to see, understand and navigate a complex African ecosystem?</p></section>
 
-    <section className="batana-section"><div className="section-copy"><SectionLabel index="09">Batana</SectionLabel><h2>Participation is<br /><em>infrastructure.</em></h2><p>A human network of contributors, participants and builders. The pathway begins with showing up.</p><ArrowLink>Join Batana</ArrowLink></div><div className="human-network"><Network preset="resolved" label="A human network of contributors and participants" /><Pathway /></div></section>
+    <section className="regional-section"><SectionLabel index="08">Transferability</SectionLabel><div className="regional-grid"><div><h2>If it works in Zimbabwe, can the underlying approach <em>transfer?</em></h2><p>Southern Africa and Africa are questions to investigate, not predetermined expansion stages.</p></div><Flow items={['ZIMBABWE', 'SOUTHERN AFRICA', 'AFRICA']} /></div></section>
 
-    <section className="network-section"><SectionLabel index="10">The network</SectionLabel><div className="network-heading"><h2>More visibility.<br />More <em>relationships.</em></h2><p>When the ecosystem is legible, boundaries become bridges. Participation compounds across enterprises, capital, institutions and projects.</p></div><Network preset="intelligence" label="Compounding relationships across the ecosystem" /></section>
+    <section id="atis" className="atis-section"><div className="section-copy"><SectionLabel index="09">System // ATIS</SectionLabel><p className="system-name">ATIS</p><p className="system-expansion">Africa Trade Intelligence System</p><h2>The system we&apos;re building to see the <em>ecosystem.</em></h2><p>ATIS is being developed as the technical embodiment of the hypothesis: resolving fragmented information into evidence, context, relationships and intelligence.</p><Flow items={['INFORMATION', 'EVIDENCE', 'CONTEXT', 'RELATIONSHIPS', 'INTELLIGENCE']} /></div><div className="atis-graph"><Network preset="intelligence" label="ATIS relationship discovery graph" /><p>Semantic intelligence is not simply a database. It is information plus context, relationships and perspective.</p></div></section>
 
-    <section className="future-section"><div className="future-line"><span>Zimbabwe</span><i>↓</i><span>More visible</span><i>↓</i><span>More understandable</span><i>↓</i><span>More connected</span><i>↓</i><strong>Africa</strong></div></section>
+    <section className="rita-section"><div><SectionLabel index="10">ATIS // Relationship intelligence</SectionLabel><h2>Not every connection is a <em>story.</em></h2><p>RITA is a conceptual intelligence layer within ATIS. It helps determine which relationships matter and which may represent meaningful stories or developments.</p></div><Flow items={['EVIDENCE', 'RELATIONSHIPS', 'TRIAGE', 'STORY GRAPH', 'CONTEXT GRAPH', 'INTELLIGENCE']} /></section>
 
-    <section id="contact" className="closing"><SectionLabel index="11">The next layer</SectionLabel><h2>When can<br /><em>I use it?</em></h2><p>The system is being built.<br />The work is already beginning.</p><div className="closing-actions"><ArrowLink>Join Batana</ArrowLink><ArrowLink>Request ATIS access</ArrowLink></div><div className="closing-words">SEE → CONNECT → UNDERSTAND → ACT → BUILD</div></section>
-    <footer className="aksos-footer"><span>AKSOS / INTELLIGENCE INFRASTRUCTURE</span><span>© 2025 AKSOS</span><a href="#top">Back to top ↑</a></footer>
+    <section className="use-cases"><SectionLabel index="11">Real-world questions</SectionLabel><h2>Different questions.<br /><em>Different meaning.</em></h2><div className="case-grid"><article><span>INVESTOR</span><h3>What is actually happening in this market?</h3><p>Companies, projects, institutions, capital, policy and relationships.</p></article><article><span>ENTERPRISE</span><h3>Who and what should I understand before entering?</h3><p>People, companies, institutions, opportunities and developments.</p></article><article><span>RESEARCHER / OPERATOR</span><h3>What does this development mean from my perspective?</h3><p>Information transformed into contextual understanding.</p></article></div></section>
+
+    <section id="batana" className="batana-section"><div className="section-copy"><SectionLabel index="12">Participation // Batana</SectionLabel><h2>The work is not meant to happen from a <em>distance.</em></h2><p>Batana is the participation and community layer around the initiative. People can participate, contribute, discover opportunities, learn, apply and potentially be selected for deeper involvement.</p><ArrowLink>Join Batana</ArrowLink></div><div className="batana-visual"><Network preset="resolved" label="A human network of contributors and participants" /><Flow items={['PARTICIPATE', 'CONTRIBUTE', 'DISCOVER', 'LEARN', 'APPLY', 'BE SELECTED']} /></div></section>
+
+    <section className="network-section"><SectionLabel index="13">The network</SectionLabel><div className="network-heading"><h2>More visibility.<br />More <em>relationships.</em></h2><p>As more people, companies, institutions, projects and information become visible, the ecosystem becomes richer.</p></div><Network preset="intelligence" label="A restrained network showing relationships across the ecosystem" /><Flow items={['MORE VISIBILITY', 'MORE CONNECTIONS', 'MORE CONTEXT', 'MORE PARTICIPATION', 'RICHER ECOSYSTEM']} /></section>
+
+    <section className="future-section"><SectionLabel index="14">The future</SectionLabel><Flow items={['ZIMBABWE', 'MORE VISIBLE', 'MORE UNDERSTANDABLE', 'MORE CONNECTED', 'SOUTHERN AFRICA', 'AFRICA']} /></section>
+
+    <section id="contact" className="closing"><SectionLabel index="15">The work is underway</SectionLabel><h2>What happens when an ecosystem becomes easier to <em>see?</em></h2><p>AKSOS is still being researched, tested and built. Zimbabwe is the first environment in which the idea is being put to work.</p><div className="closing-actions"><ArrowLink href="#batana">Join Batana</ArrowLink><ArrowLink>Request ATIS access</ArrowLink></div><div className="closing-words">SEE → CONNECT → UNDERSTAND → ACT → BUILD</div></section>
+    <footer className="aksos-footer"><span>AKSOS / AN EMERGING INITIATIVE</span><span>© 2025 AKSOS</span><a href="#top">Back to top ↑</a></footer>
   </main>
 }
+
+export default AksosPage
